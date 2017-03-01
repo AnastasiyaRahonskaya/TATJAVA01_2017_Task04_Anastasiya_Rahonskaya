@@ -1,6 +1,6 @@
 package by.epam.catalog.dao.connection;
 
-import by.epam.catalog.dao.exception.ConnectionPoolException;
+import by.epam.catalog.dao.exception.ConnectionPoolDataSourceException;
 
 import java.sql.*;
 import java.util.Locale;
@@ -41,7 +41,7 @@ public class ConnectionPool {
     return instance;
   }
 
-  public void initPoolData() throws ConnectionPoolException {
+  public void initPoolData() throws ConnectionPoolDataSourceException {
     Locale.setDefault(Locale.ENGLISH);
 
     try {
@@ -54,9 +54,9 @@ public class ConnectionPool {
         connectionQueue.add(pooledConnection);
       }
     } catch (SQLException e) {
-      throw new ConnectionPoolException("SQLException in ConnectionPool", e);
+      throw new ConnectionPoolDataSourceException("SQLException in ConnectionPool", e);
     } catch (ClassNotFoundException e) {
-      throw new ConnectionPoolException("Can't find database driver class", e);
+      throw new ConnectionPoolDataSourceException("Can't find database driver class", e);
     }
   }
 
@@ -73,13 +73,13 @@ public class ConnectionPool {
     }
   }
 
-  public Connection takeConnection() throws ConnectionPoolException {
+  public Connection takeConnection() throws ConnectionPoolDataSourceException {
     Connection connection;
     try {
       connection = connectionQueue.take();
       givenAwayConQueue.add(connection);
     } catch (InterruptedException e) {
-      throw new ConnectionPoolException("Error connection to the data source.", e);
+      throw new ConnectionPoolDataSourceException("Error connection to the data source.", e);
     }
     return connection;
   }

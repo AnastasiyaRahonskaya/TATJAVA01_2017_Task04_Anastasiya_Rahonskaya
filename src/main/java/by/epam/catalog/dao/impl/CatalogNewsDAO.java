@@ -3,10 +3,11 @@ package by.epam.catalog.dao.impl;
 import by.epam.catalog.bean.News;
 import by.epam.catalog.dao.connection.ConnectionPool;
 import by.epam.catalog.dao.NewsDAO;
-import by.epam.catalog.dao.exception.ConnectionPoolException;
+import by.epam.catalog.dao.exception.ConnectionPoolDataSourceException;
 import by.epam.catalog.dao.exception.DAOException;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * The inner interface implementation of the DAO layer
@@ -24,11 +25,11 @@ public class CatalogNewsDAO implements NewsDAO {
    * method is for adding the new
    *
    * @param news - object of the class News
-   * @throws DAOException            - exceptions caused by DAO layer
-   * @throws ConnectionPoolException - exceptions caused by ConnectionPool
+   * @throws DAOException                      - exceptions caused by DAO layer
+   * @throws ConnectionPoolDataSourceException - exceptions caused by ConnectionPool
    */
   @Override
-  public News addNew(News news) throws DAOException, ConnectionPoolException {
+  public String addNew(News news) throws DAOException, ConnectionPoolDataSourceException {
     PreparedStatement preparedStatement = null;
     Connection connection = connectionPool.takeConnection();
     String result;
@@ -44,39 +45,42 @@ public class CatalogNewsDAO implements NewsDAO {
       System.out.println(result);
       connectionPool.closeConnection(connection, preparedStatement);
     } catch (SQLException e) {
-      throw new DAOException("Error while adding the new!", e);
+      throw new DAOException(e);
     }
-    return news;
+    return result;
   }
 
   /**
    * method is for finding the new by category
    *
-   * @param category - new's category
+   * @param foundCategory - new's category
    * @return result
-   * @throws DAOException            - exceptions caused by DAO layer
-   * @throws ConnectionPoolException - exceptions caused by ConnectionPool
+   * @throws DAOException                      - exceptions caused by DAO layer
+   * @throws ConnectionPoolDataSourceException - exceptions caused by ConnectionPool
    */
   @Override
-  public News findByCategory(String category) throws DAOException, ConnectionPoolException {
+  public ArrayList<News> findByCategory(String foundCategory) throws DAOException, ConnectionPoolDataSourceException {
+    ArrayList<News> news = new ArrayList<>();
     PreparedStatement preparedStatement = null;
     ResultSet resultSet = null;
     Connection connection = connectionPool.takeConnection();
     try {
       preparedStatement = connection.prepareStatement(SQL_SELECT_BY_CATEGORY);
-      preparedStatement.setString(1, category);
+      preparedStatement.setString(1, foundCategory);
       resultSet = preparedStatement.executeQuery();
       while (resultSet.next()) {
-        news = new News(resultSet.getString(2), resultSet.getString(3), resultSet.getString(4),
-            resultSet.getString(5));
-        System.out.println(news.toString());
+        String category = resultSet.getString(2);
+        String title = resultSet.getString(3);
+        String author = resultSet.getString(4);
+        String date = resultSet.getString(5);
+        news.add(new News(category, title, author, date));
       }
       if (news == null) {
-        System.out.println("Unfortunately, we don't have news with this category.");
+        throw new DAOException("Error in findByCategory.");
       }
       connectionPool.closeConnection(connection, preparedStatement, resultSet);
     } catch (SQLException e) {
-      throw new DAOException("Error in findByCategory", e);
+      throw new DAOException(e);
     }
     return news;
   }
@@ -84,31 +88,34 @@ public class CatalogNewsDAO implements NewsDAO {
   /**
    * method is for finding the new by title
    *
-   * @param title - new's title
+   * @param foundTitle - new's title
    * @return result
-   * @throws DAOException            - exceptions caused by DAO layer
-   * @throws ConnectionPoolException - exceptions caused by ConnectionPool
+   * @throws DAOException                      - exceptions caused by DAO layer
+   * @throws ConnectionPoolDataSourceException - exceptions caused by ConnectionPool
    */
   @Override
-  public News findByTitle(String title) throws DAOException, ConnectionPoolException {
+  public ArrayList<News> findByTitle(String foundTitle) throws DAOException, ConnectionPoolDataSourceException {
+    ArrayList<News> news = new ArrayList<>();
     PreparedStatement preparedStatement = null;
     ResultSet resultSet = null;
     Connection connection = connectionPool.takeConnection();
     try {
       preparedStatement = connection.prepareStatement(SQL_SELECT_BY_TITLE);
-      preparedStatement.setString(1, title);
+      preparedStatement.setString(1, foundTitle);
       resultSet = preparedStatement.executeQuery();
       while (resultSet.next()) {
-        news = new News(resultSet.getString(2), resultSet.getString(3), resultSet.getString(4),
-            resultSet.getString(5));
-        System.out.println(news.toString());
+        String category = resultSet.getString(2);
+        String title = resultSet.getString(3);
+        String author = resultSet.getString(4);
+        String date = resultSet.getString(5);
+        news.add(new News(category, title, author, date));
       }
       if (news == null) {
-        System.out.println("Unfortunately, we don't have news with this title.");
+        throw new DAOException("Error in findByTitle.");
       }
       connectionPool.closeConnection(connection, preparedStatement, resultSet);
     } catch (SQLException e) {
-      throw new DAOException("Error in findByCategory", e);
+      throw new DAOException(e);
     }
     return news;
   }
@@ -116,31 +123,34 @@ public class CatalogNewsDAO implements NewsDAO {
   /**
    * method is for finding the new by author
    *
-   * @param author - new's author
+   * @param foundAuthor - new's author
    * @return result
-   * @throws DAOException            - exceptions caused by DAO layer
-   * @throws ConnectionPoolException - exceptions caused by ConnectionPool
+   * @throws DAOException                      - exceptions caused by DAO layer
+   * @throws ConnectionPoolDataSourceException - exceptions caused by ConnectionPool
    */
   @Override
-  public News findByAuthor(String author) throws DAOException, ConnectionPoolException {
+  public ArrayList<News> findByAuthor(String foundAuthor) throws DAOException, ConnectionPoolDataSourceException {
+    ArrayList<News> news = new ArrayList<>();
     PreparedStatement preparedStatement = null;
     ResultSet resultSet = null;
     Connection connection = connectionPool.takeConnection();
     try {
       preparedStatement = connection.prepareStatement(SQL_SELECT_BY_AUTHOR);
-      preparedStatement.setString(1, author);
+      preparedStatement.setString(1, foundAuthor);
       resultSet = preparedStatement.executeQuery();
       while (resultSet.next()) {
-        news = new News(resultSet.getString(2), resultSet.getString(3), resultSet.getString(4),
-            resultSet.getString(5));
-        System.out.println(news.toString());
+        String category = resultSet.getString(2);
+        String title = resultSet.getString(3);
+        String author = resultSet.getString(4);
+        String date = resultSet.getString(5);
+        news.add(new News(category, title, author, date));
       }
       if (news == null) {
-        System.out.println("Unfortunately, we don't have news by this author.");
+        throw new DAOException("Error in findByAuthor.");
       }
       connectionPool.closeConnection(connection, preparedStatement, resultSet);
     } catch (SQLException e) {
-      throw new DAOException("Error in findByAuthor", e);
+      throw new DAOException(e);
     }
     return news;
   }
@@ -148,42 +158,45 @@ public class CatalogNewsDAO implements NewsDAO {
   /**
    * method is for finding the new by date
    *
-   * @param date - new's date
+   * @param foundDate - new's date
    * @return result
-   * @throws DAOException            - exceptions caused by DAO layer
-   * @throws ConnectionPoolException - exceptions caused by ConnectionPool
+   * @throws DAOException                      - exceptions caused by DAO layer
+   * @throws ConnectionPoolDataSourceException - exceptions caused by ConnectionPool
    */
   @Override
-  public News findByDate(String date) throws DAOException, ConnectionPoolException {
+  public ArrayList<News> findByDate(String foundDate) throws DAOException, ConnectionPoolDataSourceException {
+    ArrayList<News> news = new ArrayList<>();
     PreparedStatement preparedStatement = null;
     ResultSet resultSet = null;
     Connection connection = connectionPool.takeConnection();
     try {
       preparedStatement = connection.prepareStatement(SQL_SELECT_BY_DATE);
-      preparedStatement.setString(1, date);
+      preparedStatement.setString(1, foundDate);
       resultSet = preparedStatement.executeQuery();
       while (resultSet.next()) {
-        news = new News(resultSet.getString(2), resultSet.getString(3), resultSet.getString(4),
-            resultSet.getString(5));
-        System.out.println(news.toString());
+        String category = resultSet.getString(2);
+        String title = resultSet.getString(3);
+        String author = resultSet.getString(4);
+        String date = resultSet.getString(5);
+        news.add(new News(category, title, author, date));
       }
       if (news == null) {
-        System.out.println("Unfortunately, we don't have news with this date of publication.");
+        throw new DAOException("Error in findByDate.");
       }
       connectionPool.closeConnection(connection, preparedStatement, resultSet);
     } catch (SQLException e) {
-      throw new DAOException("Error in findByDate", e);
+      throw new DAOException(e);
     }
     return news;
   }
 
   @Override
-  public void init() throws ConnectionPoolException {
+  public void init() throws ConnectionPoolDataSourceException {
     connectionPool.initPoolData();
   }
 
   @Override
-  public void destroy() throws ConnectionPoolException {
+  public void destroy() throws ConnectionPoolDataSourceException {
     connectionPool.dispose();
   }
 }

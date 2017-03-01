@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+
+    <Properties>
+        <Property name="filename">target/logs/log.log</Property>
+        <Property name="basePatternLayout">
+            %d{[yyyy/MM/dd] HH:mm:ss,SSS} [%-5p] (%F: %L - %M) - %m%n
+        </Property>
+    </Properties>
+
+    <Appenders>
+        <File name="File" filename="${filename}" append="true">
+            <PatternLayout pattern="${basePatternLayout}"/>
+        </File>
+
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${basePatternLayout}"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <root level="info">
+            <appender-ref ref="File"/>
+        </root>
+    </Loggers>
+
+</Configuration>
